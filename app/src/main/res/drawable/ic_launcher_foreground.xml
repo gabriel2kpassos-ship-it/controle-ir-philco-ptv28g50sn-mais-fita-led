@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- corpo do controle -->
+    <path
+        android:fillColor="#E8E8EC"
+        android:pathData="M44,20 h20 a4,4 0 0 1 4,4 v60 a4,4 0 0 1 -4,4 h-20 a4,4 0 0 1 -4,-4 v-60 a4,4 0 0 1 4,-4 z" />
+    <!-- power -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M50.5,29 a3.5,3.5 0 1 0 7,0 a3.5,3.5 0 1 0 -7,0 z" />
+    <!-- teclado numerico -->
+    <path
+        android:fillColor="#4A4C5A"
+        android:pathData="M46,37 h4 v3 h-4 z M52,37 h4 v3 h-4 z M58,37 h4 v3 h-4 z M46,42 h4 v3 h-4 z M52,42 h4 v3 h-4 z M58,42 h4 v3 h-4 z M46,47 h4 v3 h-4 z M52,47 h4 v3 h-4 z M58,47 h4 v3 h-4 z" />
+    <!-- anel de navegacao -->
+    <path
+        android:fillColor="#4A4C5A"
+        android:pathData="M45.5,64 a8.5,8.5 0 1 0 17,0 a8.5,8.5 0 1 0 -17,0 z" />
+    <!-- OK -->
+    <path
+        android:fillColor="#E8E8EC"
+        android:pathData="M51,64 a3,3 0 1 0 6,0 a3,3 0 1 0 -6,0 z" />
+    <!-- botoes coloridos -->
+    <path
+        android:fillColor="#2E9E5B"
+        android:pathData="M46,76 h4 v2.5 h-4 z" />
+    <path
+        android:fillColor="#F2C811"
+        android:pathData="M52,76 h4 v2.5 h-4 z" />
+    <path
+        android:fillColor="#1E73D8"
+        android:pathData="M58,76 h4 v2.5 h-4 z" />
+    <!-- ondas de infravermelho -->
+    <path
+        android:strokeColor="#FFB74D"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M49,15 q5,-4 10,0" />
+    <path
+        android:strokeColor="#FFB74D"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M46,12 q8,-7 16,0" />
+</vector>
