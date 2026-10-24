@@ -1,4 +1,4 @@
-# 📡 Controle IR Philco
+# 📡 Controle Remoto IR – Philco PTV28G50SN e Fita LED
 
 Aplicativo Android que transforma o celular em **controle remoto infravermelho** da **TV Philco PTV28G50SN** (controle AD1484) e de uma **fita LED de 24 teclas**, usando o emissor IR do aparelho.
 
@@ -27,7 +27,7 @@ Os botões seguem o mesmo layout dos controles originais, e os sinais foram capt
 1. Instale o [Android Studio](https://developer.android.com/studio) (com JDK 17).
 2. Clone o repositório:
    ```bash
-   git clone https://github.com/SEU-USUARIO/controle-ir-philco.git
+   git clone https://github.com/gabriel2kpassos-ship-it/controle-ir-philco-ptv28g50sn-mais-fita-led.git
    ```
 3. Abra a pasta no Android Studio e espere o Gradle sincronizar.
 4. Ative a **Depuração USB** no celular e conecte o cabo.
@@ -105,7 +105,7 @@ Para outros protocolos (RC5, Sony, Samsung...), altere a função `necFrame` par
 ## 📂 Estrutura
 
 ```
-ControlePhilco/
+controle-ir-philco-ptv28g50sn-mais-fita-led/
 ├── app/
 │   └── src/main/
 │       ├── java/com/philco/controle/MainActivity.kt   # toda a interface e o envio IR
