@@ -1,6 +1,7 @@
 package com.philco.controle
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -26,6 +27,7 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -103,10 +105,16 @@ class MainActivity : Activity() {
     private lateinit var root: LinearLayout
     private lateinit var scroll: ScrollView
     private lateinit var content: FrameLayout
-    private lateinit var tabTv: TextView
-    private lateinit var tabLed: TextView
+    private lateinit var tabStrip: LinearLayout
     private lateinit var tvPage: View
     private lateinit var ledPage: View
+
+    // Controles criados pelo usuário (abas 2, 3, 4...)
+    private val customRemotes = mutableListOf<CustomRemote>()
+    private val customPages = mutableListOf<View>()
+    private val customLeds = mutableListOf<LedView>()
+    private val tabViews = mutableListOf<TextView>()
+    private var currentTab = 0
 
     /** Endereço NEC usado pelos botões criados no momento. */
     private var currentAddr = 0xBF00
@@ -165,9 +173,7 @@ class MainActivity : Activity() {
     override fun onPause() {
         super.onPause()
         stopRepeat()
-        handler.removeCallbacks(ledOffRunnable)
-        tvLed.lit = false
-        ledLed.lit = false
+        allLedsOff()
     }
 
     override fun onDestroy() {
@@ -432,6 +438,8 @@ class MainActivity : Activity() {
             textSize = 15f
             typeface = Typeface.DEFAULT_BOLD
             gravity = Gravity.CENTER
+            maxLines = 1
+            setPadding(dp(16), 0, dp(16), 0)
             isClickable = true
             setOnClickListener { setTab(index) }
         }
@@ -446,26 +454,89 @@ class MainActivity : Activity() {
         } else ColorDrawable(Color.TRANSPARENT)
     }
 
-    private fun setTab(index: Int) {
+    private fun allLedsOff() {
         handler.removeCallbacks(ledOffRunnable)
         tvLed.lit = false
         ledLed.lit = false
+        for (l in customLeds) l.lit = false
+    }
+
+    /** Monta de novo a barra de abas: TV, Fita LED, controles criados e o botão "＋ Novo". */
+    private fun rebuildTabs() {
+        tabStrip.removeAllViews()
+        tabViews.clear()
+        fun add(t: TextView) {
+            tabViews.add(t)
+            tabStrip.addView(t, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(40)))
+        }
+        add(tab("TV Philco", 0))
+        add(tab("Fita LED", 1))
+        customRemotes.forEachIndexed { i, r ->
+            add(tab(r.name, 2 + i).apply {
+                setOnLongClickListener {
+                    showRemoteMenu(i)
+                    true
+                }
+            })
+        }
+        val plus = TextView(this).apply {
+            text = "＋ Novo"
+            textSize = 15f
+            typeface = Typeface.DEFAULT_BOLD
+            gravity = Gravity.CENTER
+            maxLines = 1
+            setPadding(dp(16), 0, dp(16), 0)
+            setTextColor(Color.parseColor("#8FA8FF"))
+            isClickable = true
+            setOnClickListener { openCreator(null) }
+        }
+        tabStrip.addView(plus, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(40)))
+    }
+
+    private fun rebuildCustomPages() {
+        customLeds.clear()
+        customPages.clear()
+        for (r in customRemotes) {
+            val led = LedView(this)
+            customLeds.add(led)
+            customPages.add(wrapBody(buildCustomBody(r, led)))
+        }
+    }
+
+    private fun setTab(index: Int) {
+        currentTab = index
+        allLedsOff()
         stopRepeat()
         content.removeAllViews()
-        if (index == 0) {
-            content.addView(tvPage)
-            activeLed = tvLed
-            root.background = ColorDrawable(Color.BLACK)
-        } else {
-            content.addView(ledPage)
-            activeLed = ledLed
-            root.background = GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,
-                intArrayOf(Color.parseColor("#1E3A8A"), Color.parseColor("#1FB5C8"))
-            )
+        val ci = index - 2
+        when {
+            index == 0 -> {
+                content.addView(tvPage)
+                activeLed = tvLed
+                root.background = ColorDrawable(Color.BLACK)
+            }
+            index == 1 -> {
+                content.addView(ledPage)
+                activeLed = ledLed
+                root.background = GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    intArrayOf(Color.parseColor("#1E3A8A"), Color.parseColor("#1FB5C8"))
+                )
+            }
+            ci in customRemotes.indices -> {
+                content.addView(customPages[ci])
+                activeLed = customLeds[ci]
+                root.background = GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    intArrayOf(shift(customRemotes[ci].accent, -90), Color.BLACK)
+                )
+            }
+            else -> {
+                setTab(0)
+                return
+            }
         }
-        styleTab(tabTv, index == 0)
-        styleTab(tabLed, index == 1)
+        for (i in tabViews.indices) styleTab(tabViews[i], i == index)
         scroll.scrollTo(0, 0)
     }
 
@@ -477,11 +548,21 @@ class MainActivity : Activity() {
         tvPage = wrapBody(buildTvBody())
         ledPage = wrapBody(buildLedBody())
 
+        customRemotes.clear()
+        customRemotes.addAll(RemoteStore.load(this))
+        rebuildCustomPages()
+
         root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
 
-        tabTv = tab("TV Philco", 0)
-        tabLed = tab("Fita LED", 1)
+        tabStrip = LinearLayout(this)
+        tabStrip.orientation = LinearLayout.HORIZONTAL
+        val tabScroll = HorizontalScrollView(this)
+        tabScroll.isHorizontalScrollBarEnabled = false
+        tabScroll.addView(
+            tabStrip,
+            FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        )
         val bar = LinearLayout(this)
         bar.orientation = LinearLayout.HORIZONTAL
         bar.setPadding(dp(4), dp(4), dp(4), dp(4))
@@ -489,8 +570,13 @@ class MainActivity : Activity() {
             setColor(Color.parseColor("#CC1E1E24"))
             cornerRadius = dp(24).toFloat()
         }
-        bar.addView(tabTv, LinearLayout.LayoutParams(0, dp(40), 1f))
-        bar.addView(tabLed, LinearLayout.LayoutParams(0, dp(40), 1f))
+        bar.addView(
+            tabScroll,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        )
         root.addView(
             bar,
             LinearLayout.LayoutParams(
@@ -508,8 +594,111 @@ class MainActivity : Activity() {
             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f)
         )
 
+        rebuildTabs()
         setTab(0)
         return root
+    }
+
+    // ------------------------------------------------------------------
+    // Controles criados pelo usuário
+    // ------------------------------------------------------------------
+
+    private fun buildCustomBody(r: CustomRemote, led: LedView): View {
+        val body = LinearLayout(this)
+        body.orientation = LinearLayout.VERTICAL
+        body.setPadding(dp(14), dp(10), dp(14), dp(18))
+        body.background = GradientDrawable().apply {
+            setColor(bodyColor)
+            cornerRadius = dp(30).toFloat()
+            setStroke(dp(2), r.accent)
+        }
+        body.addView(led, ledLp())
+
+        for (row in 0 until r.rows) {
+            val line = LinearLayout(this)
+            line.orientation = LinearLayout.HORIZONTAL
+            var c = 0
+            while (c < CustomRemote.COLS) {
+                val b = r.buttonAt(row, c)
+                if (b != null && b.col == c) {
+                    line.addView(
+                        key(
+                            b.label, b.cmd,
+                            color = b.color,
+                            textColor = readableOn(b.color),
+                            radius = 18,
+                            sizeSp = if (b.label.length > 6) 11f else 16f,
+                            repeat = b.repeat,
+                            addr = b.addr
+                        ),
+                        lp(0, dp(60), b.span.toFloat())
+                    )
+                    c += b.span
+                } else {
+                    line.addView(spacer(), lp(0, dp(60), 1f))
+                    c += 1
+                }
+            }
+            body.addView(line)
+        }
+
+        body.addView(label(r.name, 10f).apply { setPadding(0, dp(10), 0, 0) })
+        return body
+    }
+
+    /** Abre o assistente: [editIndex] = null cria um controle novo; senão edita o controle dessa posição. */
+    private fun openCreator(editIndex: Int?) {
+        val working = if (editIndex == null) {
+            CustomRemote(System.currentTimeMillis().toString(), "", Palette.COLORS[6], -1, 5)
+        } else {
+            customRemotes[editIndex].deepCopy()
+        }
+        RemoteEditor(
+            this,
+            working,
+            editIndex == null,
+            { saved ->
+                if (editIndex == null) customRemotes.add(saved) else customRemotes[editIndex] = saved
+                RemoteStore.save(this, customRemotes)
+                rebuildCustomPages()
+                rebuildTabs()
+                setTab(if (editIndex == null) 1 + customRemotes.size else 2 + editIndex)
+            },
+            { addr, cmd -> testSend(addr, cmd) }
+        ).show()
+    }
+
+    /** Envio de teste feito pelo assistente (com o mesmo feedback dos botões). */
+    private fun testSend(addr: Int, cmd: Int) {
+        vibrate()
+        playClick()
+        send(necFrame(addr, cmd))
+    }
+
+    private fun showRemoteMenu(i: Int) {
+        val r = customRemotes[i]
+        AlertDialog.Builder(this)
+            .setTitle(r.name)
+            .setItems(arrayOf("✏️  Editar controle", "🗑️  Excluir controle")) { _, which ->
+                if (which == 0) openCreator(i) else confirmDelete(i)
+            }
+            .show()
+    }
+
+    private fun confirmDelete(i: Int) {
+        val r = customRemotes[i]
+        AlertDialog.Builder(this)
+            .setTitle("Excluir \"${r.name}\"?")
+            .setMessage("Os botões deste controle serão apagados.")
+            .setPositiveButton("Excluir") { _, _ ->
+                customRemotes.removeAt(i)
+                RemoteStore.save(this, customRemotes)
+                rebuildCustomPages()
+                rebuildTabs()
+                setTab(0)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     // ------------------------------------------------------------------
