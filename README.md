@@ -14,7 +14,8 @@ Os botões seguem o mesmo layout dos controles originais, e os sinais foram capt
 - 💡 **Controle de fita LED de 24 teclas**: brilho, ON/OFF, R/G/B/W, 16 cores e os efeitos FLASH, STROBE, FADE e SMOOTH.
 - 🔁 **Segurar para repetir** em setas, volume, canal e brilho.
 - 📳 **Vibração**, 🔊 **som de clique** e 🔴 **LED vermelho** no topo do controle acendendo a cada toque.
-- 🗂️ **Duas abas** para alternar entre os controles.
+- 🗂️ **Abas** para alternar entre os controles (rolam para o lado quando há muitos).
+- 🛠️ **Criador de controles**: monte controles novos dentro do app, de forma visual (veja abaixo).
 
 ## 📱 Requisitos
 
@@ -41,6 +42,19 @@ Para gerar um APK: **Build > Build APK(s)**.
 1. Abra o app e escolha a aba **TV Philco** ou **Fita LED**.
 2. Aponte o **topo do celular** (onde fica o emissor IR) para o aparelho.
 3. Toque nos botões. Segure setas, volume, canal ou brilho para repetir o comando.
+
+## 🛠️ Criar seu próprio controle
+
+Toque em **＋ Novo** na barra de abas para abrir o assistente, em 2 passos:
+
+1. **Nome e aparência**: escolha o nome, a cor, o ponto de partida (*Em branco* ou *TV básico*) e o **endereço** do aparelho (ex.: `BF00`).
+2. **Monte os botões**: o controle aparece numa grade de 4 colunas. Toque num espaço com **＋** para adicionar um botão; toque num botão existente para editar ou apagar.
+
+Em cada botão você define o **nome** (aceita emoji), a **cor**, o **tamanho** (normal ou largo), o **código do comando** (2 dígitos hexadecimais) e se ele **repete ao segurar**. O botão **▶ Testar agora** envia o sinal na hora, sem sair da tela.
+
+- **Editar ou excluir**: segure o dedo sobre a aba do controle.
+- Os controles ficam salvos no próprio celular.
+- O criador usa o protocolo **NEC** (38 kHz), o mesmo dos controles que já vêm no app. O celular só transmite, então os códigos precisam vir do manual, de uma lista na internet ou de uma captura feita por você.
 
 ## 🔬 Como funciona
 
@@ -108,7 +122,9 @@ Para outros protocolos (RC5, Sony, Samsung...), altere a função `necFrame` par
 controle-ir-philco-ptv28g50sn-mais-fita-led/
 ├── app/
 │   └── src/main/
-│       ├── java/com/philco/controle/MainActivity.kt   # toda a interface e o envio IR
+│       ├── java/com/philco/controle/MainActivity.kt   # interface, abas e envio IR
+│       ├── java/com/philco/controle/RemoteEditor.kt   # assistente visual de criação de controles
+│       ├── java/com/philco/controle/CustomRemotes.kt  # modelo e armazenamento dos controles criados
 │       ├── res/                                       # ícone do app
 │       └── AndroidManifest.xml                        # permissões (TRANSMIT_IR, VIBRATE)
 ├── build.gradle.kts
