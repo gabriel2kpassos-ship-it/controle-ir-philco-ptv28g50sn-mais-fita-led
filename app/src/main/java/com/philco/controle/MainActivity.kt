@@ -621,18 +621,23 @@ class MainActivity : Activity() {
             while (c < CustomRemote.COLS) {
                 val b = r.buttonAt(row, c)
                 if (b != null && b.col == c) {
-                    line.addView(
-                        key(
-                            b.label, b.cmd,
-                            color = b.color,
-                            textColor = readableOn(b.color),
-                            radius = 18,
-                            sizeSp = if (b.label.length > 6) 11f else 16f,
-                            repeat = b.repeat,
-                            addr = b.addr
-                        ),
-                        lp(0, dp(60), b.span.toFloat())
-                    )
+                    if (b.cmd >= 0) {
+                        line.addView(
+                            key(
+                                b.label, b.cmd,
+                                color = b.color,
+                                textColor = readableOn(b.color),
+                                radius = 18,
+                                sizeSp = if (b.label.length > 6) 11f else 16f,
+                                repeat = b.repeat,
+                                addr = b.addr
+                            ),
+                            lp(0, dp(60), b.span.toFloat())
+                        )
+                    } else {
+                        // botão ainda sem código: fica escondido
+                        line.addView(spacer(), lp(0, dp(60), b.span.toFloat()))
+                    }
                     c += b.span
                 } else {
                     line.addView(spacer(), lp(0, dp(60), 1f))

@@ -15,7 +15,7 @@ Os botões seguem o mesmo layout dos controles originais, e os sinais foram capt
 - 🔁 **Segurar para repetir** em setas, volume, canal e brilho.
 - 📳 **Vibração**, 🔊 **som de clique** e 🔴 **LED vermelho** no topo do controle acendendo a cada toque.
 - 🗂️ **Abas** para alternar entre os controles (rolam para o lado quando há muitos).
-- 🛠️ **Criador de controles**: monte controles novos dentro do app, de forma visual (veja abaixo).
+- 🛠️ **Criador de controles**: escolha o tipo de aparelho e ensine os códigos, tudo dentro do app (veja abaixo).
 
 ## 📱 Requisitos
 
@@ -45,16 +45,18 @@ Para gerar um APK: **Build > Build APK(s)**.
 
 ## 🛠️ Criar seu próprio controle
 
-Toque em **＋ Novo** na barra de abas para abrir o assistente, em 2 passos:
+Toque em **＋ Novo** na barra de abas. O assistente funciona em 2 passos, no estilo do Mi Remote:
 
-1. **Nome e aparência**: escolha o nome, a cor, o ponto de partida (*Em branco* ou *TV básico*) e o **endereço** do aparelho (ex.: `BF00`).
-2. **Monte os botões**: o controle aparece numa grade de 4 colunas. Toque num espaço com **＋** para adicionar um botão; toque num botão existente para editar ou apagar.
+1. **Escolha o aparelho**: TV, receptor/TV box, som, projetor, ventilador, luz/fita LED ou em branco. O controle já vem montado, com os botões do tipo escolhido.
+2. **Ensine os códigos**: informe o **código do aparelho** (ex.: `BF00`) e toque em cada botão para definir o código dele. Em cada botão há:
+   - **▶ Testar**: envia o sinal na hora.
+   - **🔎 Procurar**: o app envia um código por vez (00, 01, 02...) e você toca em **Esse funcionou!** quando o aparelho reagir.
 
-Em cada botão você define o **nome** (aceita emoji), a **cor**, o **tamanho** (normal ou largo), o **código do comando** (2 dígitos hexadecimais) e se ele **repete ao segurar**. O botão **▶ Testar agora** envia o sinal na hora, sem sair da tela.
+Botões com borda laranja ainda não têm código e ficam escondidos no controle. Dá para **＋ Adicionar botão** extra e **Apagar** os que não quiser.
 
 - **Editar ou excluir**: segure o dedo sobre a aba do controle.
 - Os controles ficam salvos no próprio celular.
-- O criador usa o protocolo **NEC** (38 kHz), o mesmo dos controles que já vêm no app. O celular só transmite, então os códigos precisam vir do manual, de uma lista na internet ou de uma captura feita por você.
+- Usa o protocolo **NEC** (38 kHz), o mesmo dos controles que já vêm no app. O app não tem uma base de códigos de marcas: o código do aparelho precisa vir do manual, de uma lista na internet ou de uma captura sua.
 
 ## 🔬 Como funciona
 
